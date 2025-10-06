@@ -3,6 +3,12 @@ name = "microservices"
 version = "0.1.0"
 edition = "2024"
 
+[lints.rust]
+unused_imports = "allow"
+unused_variables = "allow"
+unreachable_code = "allow"
+dead_code = "allow"
+
 [[bin]]
 name = "auth"
 path = "src/auth-service/main.rs"
@@ -16,14 +22,14 @@ name = "health-check"
 path = "src/health-check-service/main.rs"
 
 [dependencies]
-tonic = "0.14.2"
-prost = "0.14.1"
+tonic = "0.9" # used by all
+prost = "0.11"
 tokio = { version = "1.47.1", features = ["macros", "rt-multi-thread", "time"] }
 uuid = { version = "1.18.1", features = ["v4"] }
-pbkdf2 = { version = "0.12.2", features = ["simple"] }
-rand_core = { version = "0.9.3", features = ["std"] }
+pbkdf2 = { version = "0.12", features = ["simple"] }
+rand_core = { version = "0.6", features = ["std"] }
 clap = { version = "4.5.48", features = ["derive"] }
 
 [build-dependencies]
-tonic-prost-build = "0.14.2"
+tonic-build = "0.9"
 
