@@ -16,7 +16,6 @@ pub mod authentication {
     tonic::include_proto!("authentication");
 }
 
-// Re-exporting
 pub use authentication::auth_server::AuthServer;
 pub use tonic::transport::Server;
 
@@ -47,14 +46,10 @@ impl Auth for AuthService {
 
         let req = request.into_inner();
 
-        // Get user's uuid from `users_service`. Panic if the lock is poisoned.
         let result = match self.users_service.lock() {
             Ok(guard) => guard.get_user_uuid(req.username, req.password),
             _ => panic!("AuthService.sign_in ->> poisoned users_service lock!")
         };
-
-        // Match on `result`. If `result` is `None` return a SignInResponse with the `status_code` set to `Failure`
-        // and `user_uuid`/`session_token` set to empty strings.
         let user_uuid: String = match result {
             Some(user_uuid) => user_uuid,
             None => { 
@@ -70,13 +65,11 @@ impl Auth for AuthService {
             }
         };
 
-        // Create new session using `sessions_service`. Panic if the lock is poisoned.
         let session_token: String = match self.sessions_service.lock() {
             Ok(mut guard) => guard.create_session(&user_uuid),
             _ => panic!("AuthService.sign_in ->> poisoned sessions_service lock!")
         };
 
-        // Create a `SignInResponse` with `status_code` set to `Success`
         let reply: SignInResponse = SignInResponse {
             status_code: StatusCode::Success.into(),
             user_uuid: String::from(user_uuid),
@@ -94,13 +87,11 @@ impl Auth for AuthService {
 
         let req = request.into_inner();
 
-        // Create a new user through `users_service`. Panic if the lock is poisoned.
         let result: Result<(), String> = match self.users_service.lock() {
             Ok(mut guard) => guard.create_user(req.username, req.password),
             _ => panic!("AuthService.sign_in ->> poisoned users_service lock!")
         };
 
-        // TODO: Return a `SignUpResponse` with the appropriate `status_code` based on `result`.
         match result {
             Ok(_) => {
                 Ok(Response::new(SignUpResponse{ status_code: StatusCode::Success.into()}))
@@ -119,13 +110,11 @@ impl Auth for AuthService {
 
         let req = request.into_inner();
 
-        // TODO: Delete session using `sessions_service`.
          match self.sessions_service.lock() {
             Ok(mut guard) => guard.delete_session(&req.session_token),
             _ => panic!("AuthService.sign_in ->> poisoned sessions_service lock!")
         };
 
-        // Create `SignOutResponse` with `status_code` set to `Success`
         let reply: SignOutResponse = SignOutResponse {
             status_code: StatusCode::Success.into(),
         };

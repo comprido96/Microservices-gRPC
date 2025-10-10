@@ -28,7 +28,6 @@ pub struct UsersImpl {
 
 impl Users for UsersImpl {
     fn create_user(&mut self, username: String, password: String) -> Result<(), String> {
-        // TODO: Check if username already exist. If so return an error.
         if self.username_to_user.contains_key(&username) {
             return Err(String::from("A user with this name already exists."));
         }
@@ -47,7 +46,6 @@ impl Users for UsersImpl {
             password: hashed_password,
         };
 
-        // TODO: Add user to `username_to_user` and `uuid_to_user`.
         self.username_to_user.insert(username, user.clone());
         self.uuid_to_user.insert(user_uuid, user);
 
@@ -78,7 +76,6 @@ impl Users for UsersImpl {
     }
 
     fn delete_user(&mut self, user_uuid: String) {
-        // TODO: Remove user from `username_to_user` and `uuid_to_user`.
         let user = self.uuid_to_user.remove(&user_uuid);
         if let Some(user) = user {
             let username = &user.username;
